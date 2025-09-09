@@ -120,6 +120,18 @@ class AgenticPairProgrammer:
     _agent: Optional[AgentExecutor] = field(init=False, default=None)
 
     def __post_init__(self) -> None:
+        """Initialise the agent's environment after construction.
+
+        This method is automatically called by the dataclass constructor.
+        It resolves the project path, ensures it exists, and creates the
+        memory directory if needed.  It also prepares lazy-initialisation
+        stubs for the language model and memory.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the provided ``project_path`` does not exist.
+        """
         # Ensure the project path exists.
         self.root = Path(self.project_path).expanduser().resolve()
         if not self.root.exists():
@@ -411,21 +423,100 @@ class AgenticPairProgrammer:
 
     # Convenience synchronous wrappers
     def run_proactive_code_synthesis(self, goal: str) -> str:
-        """Synchronous wrapper around ``proactive_code_synthesis``."""
+        """Synchronous wrapper for :meth:`proactive_code_synthesis`.
+
+        This method provides a blocking interface to the asynchronous
+        :meth:`proactive_code_synthesis` method.  Refer to that method's
+        docstring for detailed information on parameters and behaviour.
+
+        Parameters
+        ----------
+        goal : str
+            High-level description of what the agent should implement.
+
+        Returns
+        -------
+        str
+            Proposed code snippet or explanation.
+        """
         return asyncio.run(self.proactive_code_synthesis(goal))
 
-    def run_debug_code(self, error_message: str, context_files: Optional[List[str]] = None) -> str:
-        """Synchronous wrapper around ``debug_code``."""
+    def run_debug_code(
+        self, error_message: str, context_files: Optional[List[str]] = None
+    ) -> str:
+        """Synchronous wrapper for :meth:`debug_code`.
+
+        This method provides a blocking interface to the asynchronous
+        :meth:`debug_code` method.  Refer to that method's docstring for
+        detailed information on parameters and behaviour.
+
+        Parameters
+        ----------
+        error_message : str
+            The stack trace or error output produced during execution.
+        context_files : list[str], optional
+            List of relative file paths to inspect.
+
+        Returns
+        -------
+        str
+            Proposed fix or analysis of the error.
+        """
         return asyncio.run(self.debug_code(error_message, context_files))
 
-    def run_refactor_code(self, target_files: List[str], objectives: Optional[str] = None) -> str:
-        """Synchronous wrapper around ``refactor_code``."""
+    def run_refactor_code(
+        self, target_files: List[str], objectives: Optional[str] = None
+    ) -> str:
+        """Synchronous wrapper for :meth:`refactor_code`.
+
+        This method provides a blocking interface to the asynchronous
+        :meth:`refactor_code` method.  Refer to that method's docstring
+        for detailed information on parameters and behaviour.
+
+        Parameters
+        ----------
+        target_files : list[str]
+            Relative paths of files to refactor.
+        objectives : str, optional
+            High-level description of the refactoring goals.
+
+        Returns
+        -------
+        str
+            The agent's proposed refactor changes.
+        """
         return asyncio.run(self.refactor_code(target_files, objectives))
 
     def run_quantum_optimize(self, problem_description: str) -> str:
-        """Synchronous wrapper around ``quantum_optimize``."""
+        """Synchronous wrapper for :meth:`quantum_optimize`.
+
+        This method provides a blocking interface to the asynchronous
+        :meth:`quantum_optimize` method.  Refer to that method's
+        docstring for detailed information on parameters and behaviour.
+
+        Parameters
+        ----------
+        problem_description : str
+            Description of the optimisation problem.
+
+        Returns
+        -------
+        str
+            A human-readable description of the solution or next steps.
+        """
         return asyncio.run(self.quantum_optimize(problem_description))
 
     def run_meta_learn(self, feedback: str) -> None:
-        """Synchronous wrapper around ``meta_learn``."""
+        """Synchronous wrapper for :meth:`meta_learn`.
+
+        This method provides a blocking interface to the asynchronous
+        :meth:`meta_learn` method.  Refer to that method's docstring for
+        detailed information on parameters and behaviour.
+
+        Parameters
+        ----------
+        feedback : str
+            Textual feedback describing the success or failure of an
+            agent action.
+        """
         asyncio.run(self.meta_learn(feedback))
