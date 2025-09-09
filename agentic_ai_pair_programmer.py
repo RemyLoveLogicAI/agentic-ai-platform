@@ -60,6 +60,7 @@ them to synchronous equivalents.
 from __future__ import annotations
 
 import asyncio
+import datetime as _datetime
 import json
 import logging
 from dataclasses import dataclass, field
@@ -412,7 +413,6 @@ class AgenticPairProgrammer:
         self._ensure_llm()
         assert self.memory is not None
         # Each feedback entry includes a timestamp and description
-        import datetime as _datetime
         doc = {
             "page_content": feedback,
             "metadata": {"timestamp": _datetime.datetime.utcnow().isoformat()},
@@ -421,102 +421,97 @@ class AgenticPairProgrammer:
         self.memory.save_context({}, doc)
         logger.debug("Saved feedback to vector store: %s", feedback)
 
+    def _log_event(
+        self, event_name: str, inputs: Dict[str, Any], output: str
+    ) -> None:
+        """Log an agent event to the monitoring file."""
+        log_file = self.root / "monitoring_log.jsonl"
+        log_entry = {
+            "timestamp": _datetime.datetime.utcnow().isoformat(),
+            "event": event_name,
+            "inputs": inputs,
+            "output": output,
+        }
+        try:
+            with log_file.open("a") as f:
+                f.write(json.dumps(log_entry) + "\n")
+        except Exception as e:
+            logger.error("Failed to write to monitoring log: %s", e)
+
     # Convenience synchronous wrappers
     def run_proactive_code_synthesis(self, goal: str) -> str:
-        """Synchronous wrapper for :meth:`proactive_code_synthesis`.
-
-        This method provides a blocking interface to the asynchronous
-        :meth:`proactive_code_synthesis` method.  Refer to that method's
-        docstring for detailed information on parameters and behaviour.
-
-        Parameters
-        ----------
-        goal : str
-            High-level description of what the agent should implement.
-
-        Returns
-        -------
-        str
-            Proposed code snippet or explanation.
-        """
-        return asyncio.run(self.proactive_code_synthesis(goal))
+        """Synchronous wrapper for :meth:`proactive_code_synthesis`."""
+        result = ""
+        try:
+            result = asyncio.run(self.proactive_code_synthesis(goal))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_proactive_code_synthesis", {"goal": goal}, result
+            )
 
     def run_debug_code(
         self, error_message: str, context_files: Optional[List[str]] = None
     ) -> str:
-        """Synchronous wrapper for :meth:`debug_code`.
-
-        This method provides a blocking interface to the asynchronous
-        :meth:`debug_code` method.  Refer to that method's docstring for
-        detailed information on parameters and behaviour.
-
-        Parameters
-        ----------
-        error_message : str
-            The stack trace or error output produced during execution.
-        context_files : list[str], optional
-            List of relative file paths to inspect.
-
-        Returns
-        -------
-        str
-            Proposed fix or analysis of the error.
-        """
-        return asyncio.run(self.debug_code(error_message, context_files))
+        """Synchronous wrapper for :meth:`debug_code`."""
+        result = ""
+        try:
+            result = asyncio.run(self.debug_code(error_message, context_files))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_debug_code",
+                {"error_message": error_message, "context_files": context_files},
+                result,
+            )
 
     def run_refactor_code(
         self, target_files: List[str], objectives: Optional[str] = None
     ) -> str:
-        """Synchronous wrapper for :meth:`refactor_code`.
-
-        This method provides a blocking interface to the asynchronous
-        :meth:`refactor_code` method.  Refer to that method's docstring
-        for detailed information on parameters and behaviour.
-
-        Parameters
-        ----------
-        target_files : list[str]
-            Relative paths of files to refactor.
-        objectives : str, optional
-            High-level description of the refactoring goals.
-
-        Returns
-        -------
-        str
-            The agent's proposed refactor changes.
-        """
-        return asyncio.run(self.refactor_code(target_files, objectives))
+        """Synchronous wrapper for :meth:`refactor_code`."""
+        result = ""
+        try:
+            result = asyncio.run(self.refactor_code(target_files, objectives))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_refactor_code",
+                {"target_files": target_files, "objectives": objectives},
+                result,
+            )
 
     def run_quantum_optimize(self, problem_description: str) -> str:
-        """Synchronous wrapper for :meth:`quantum_optimize`.
-
-        This method provides a blocking interface to the asynchronous
-        :meth:`quantum_optimize` method.  Refer to that method's
-        docstring for detailed information on parameters and behaviour.
-
-        Parameters
-        ----------
-        problem_description : str
-            Description of the optimisation problem.
-
-        Returns
-        -------
-        str
-            A human-readable description of the solution or next steps.
-        """
-        return asyncio.run(self.quantum_optimize(problem_description))
+        """Synchronous wrapper for :meth:`quantum_optimize`."""
+        result = ""
+        try:
+            result = asyncio.run(self.quantum_optimize(problem_description))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_quantum_optimize",
+                {"problem_description": problem_description},
+                result,
+            )
 
     def run_meta_learn(self, feedback: str) -> None:
-        """Synchronous wrapper for :meth:`meta_learn`.
-
-        This method provides a blocking interface to the asynchronous
-        :meth:`meta_learn` method.  Refer to that method's docstring for
-        detailed information on parameters and behaviour.
-
-        Parameters
-        ----------
-        feedback : str
-            Textual feedback describing the success or failure of an
-            agent action.
-        """
-        asyncio.run(self.meta_learn(feedback))
+        """Synchronous wrapper for :meth:`meta_learn`."""
+        result = "Feedback recorded successfully."
+        try:
+            asyncio.run(self.meta_learn(feedback))
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event("run_meta_learn", {"feedback": feedback}, result)

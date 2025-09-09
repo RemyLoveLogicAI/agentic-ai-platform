@@ -22,10 +22,10 @@ The class is built around modern AI frameworks like LangChain and vector databas
 
 2.  **Install dependencies:**
 
-    The core logic of this agent relies on several external libraries. You can install them using pip:
+    The project dependencies are listed in the `requirements.txt` file. Install them using pip:
 
     ```bash
-    pip install langchain openai chromadb tiktoken
+    pip install -r requirements.txt
     ```
 
 3.  **Set up your environment:**
@@ -36,7 +36,24 @@ The class is built around modern AI frameworks like LangChain and vector databas
     export OPENAI_API_KEY="your-api-key-here"
     ```
 
-## Usage
+## Web UI Usage
+
+This project includes a simple web interface to interact with the agent and a dashboard to monitor its activity.
+
+1.  **Run the web server:**
+    ```bash
+    python app.py
+    ```
+
+2.  **Access the application:**
+    Open your web browser and navigate to `http://127.0.0.1:8080`.
+
+    -   The **Home** page provides a form to submit goals to the agent.
+    -   The **Dashboard** page displays a log of all agent activities.
+
+**Note:** Ensure you have set the `OPENAI_API_KEY` environment variable as described in the "Setup" section before running the application.
+
+## Command-Line Usage
 
 The following example shows how to initialise the agent and ask it to propose a code snippet for a simple HTTP server using FastAPI.
 
