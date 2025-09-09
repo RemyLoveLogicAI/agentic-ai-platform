@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Dashboard</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; padding: 2em; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        pre { background-color: #f4f4f4; padding: 1em; border-radius: 5px; white-space: pre-wrap; }
+        .nav { margin-bottom: 2em; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/">Home</a> | <a href="/dashboard">Dashboard</a>
+    </div>
+    <h1>Monitoring Dashboard</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Event</th>
+                <th>Inputs</th>
+                <th>Output</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.timestamp }}</td>
+                <td>{{ log.event }}</td>
+                <td><pre>{{ log.inputs | tojson(indent=2) }}</pre></td>
+                <td><pre>{{ log.output }}</pre></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No log entries found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

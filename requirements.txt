@@ -1,0 +1,6 @@
+Flask
+langchain
+langchain-community
+openai
+chromadb
+tiktoken

@@ -60,6 +60,7 @@ them to synchronous equivalents.
 from __future__ import annotations
 
 import asyncio
+import datetime as _datetime
 import json
 import logging
 from dataclasses import dataclass, field
@@ -120,6 +121,18 @@ class AgenticPairProgrammer:
     _agent: Optional[AgentExecutor] = field(init=False, default=None)
 
     def __post_init__(self) -> None:
+        """Initialise the agent's environment after construction.
+
+        This method is automatically called by the dataclass constructor.
+        It resolves the project path, ensures it exists, and creates the
+        memory directory if needed.  It also prepares lazy-initialisation
+        stubs for the language model and memory.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the provided ``project_path`` does not exist.
+        """
         # Ensure the project path exists.
         self.root = Path(self.project_path).expanduser().resolve()
         if not self.root.exists():
@@ -400,7 +413,6 @@ class AgenticPairProgrammer:
         self._ensure_llm()
         assert self.memory is not None
         # Each feedback entry includes a timestamp and description
-        import datetime as _datetime
         doc = {
             "page_content": feedback,
             "metadata": {"timestamp": _datetime.datetime.utcnow().isoformat()},
@@ -409,23 +421,97 @@ class AgenticPairProgrammer:
         self.memory.save_context({}, doc)
         logger.debug("Saved feedback to vector store: %s", feedback)
 
+    def _log_event(
+        self, event_name: str, inputs: Dict[str, Any], output: str
+    ) -> None:
+        """Log an agent event to the monitoring file."""
+        log_file = self.root / "monitoring_log.jsonl"
+        log_entry = {
+            "timestamp": _datetime.datetime.utcnow().isoformat(),
+            "event": event_name,
+            "inputs": inputs,
+            "output": output,
+        }
+        try:
+            with log_file.open("a") as f:
+                f.write(json.dumps(log_entry) + "\n")
+        except Exception as e:
+            logger.error("Failed to write to monitoring log: %s", e)
+
     # Convenience synchronous wrappers
     def run_proactive_code_synthesis(self, goal: str) -> str:
-        """Synchronous wrapper around ``proactive_code_synthesis``."""
-        return asyncio.run(self.proactive_code_synthesis(goal))
+        """Synchronous wrapper for :meth:`proactive_code_synthesis`."""
+        result = ""
+        try:
+            result = asyncio.run(self.proactive_code_synthesis(goal))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_proactive_code_synthesis", {"goal": goal}, result
+            )
 
-    def run_debug_code(self, error_message: str, context_files: Optional[List[str]] = None) -> str:
-        """Synchronous wrapper around ``debug_code``."""
-        return asyncio.run(self.debug_code(error_message, context_files))
+    def run_debug_code(
+        self, error_message: str, context_files: Optional[List[str]] = None
+    ) -> str:
+        """Synchronous wrapper for :meth:`debug_code`."""
+        result = ""
+        try:
+            result = asyncio.run(self.debug_code(error_message, context_files))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_debug_code",
+                {"error_message": error_message, "context_files": context_files},
+                result,
+            )
 
-    def run_refactor_code(self, target_files: List[str], objectives: Optional[str] = None) -> str:
-        """Synchronous wrapper around ``refactor_code``."""
-        return asyncio.run(self.refactor_code(target_files, objectives))
+    def run_refactor_code(
+        self, target_files: List[str], objectives: Optional[str] = None
+    ) -> str:
+        """Synchronous wrapper for :meth:`refactor_code`."""
+        result = ""
+        try:
+            result = asyncio.run(self.refactor_code(target_files, objectives))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_refactor_code",
+                {"target_files": target_files, "objectives": objectives},
+                result,
+            )
 
     def run_quantum_optimize(self, problem_description: str) -> str:
-        """Synchronous wrapper around ``quantum_optimize``."""
-        return asyncio.run(self.quantum_optimize(problem_description))
+        """Synchronous wrapper for :meth:`quantum_optimize`."""
+        result = ""
+        try:
+            result = asyncio.run(self.quantum_optimize(problem_description))
+            return result
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event(
+                "run_quantum_optimize",
+                {"problem_description": problem_description},
+                result,
+            )
 
     def run_meta_learn(self, feedback: str) -> None:
-        """Synchronous wrapper around ``meta_learn``."""
-        asyncio.run(self.meta_learn(feedback))
+        """Synchronous wrapper for :meth:`meta_learn`."""
+        result = "Feedback recorded successfully."
+        try:
+            asyncio.run(self.meta_learn(feedback))
+        except Exception as e:
+            result = f"An error occurred: {e}"
+            raise
+        finally:
+            self._log_event("run_meta_learn", {"feedback": feedback}, result)
