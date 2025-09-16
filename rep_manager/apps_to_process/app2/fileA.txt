@@ -1,0 +1,1 @@
+This is file A for application 2, with some new changes.

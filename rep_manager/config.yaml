@@ -1,0 +1,16 @@
+# Configuration for the Repository Application Manager
+
+# Path to the directory containing the applications to process.
+apps_directory: "apps_to_process"
+
+# Path to the directory where the packaged archives will be stored.
+output_directory: "packaged_apps"
+
+# Path to the directory where deployment plans will be stored.
+deployment_plans_directory: "deployment_plans"
+
+# Path to the SQLite database file for storing metadata.
+database_path: "data/metadata.db"
+
+# Log level for the script.
+log_level: "INFO"
