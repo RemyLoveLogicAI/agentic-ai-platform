@@ -1,0 +1,6 @@
+{
+  "applications_dir": "rep_applications",
+  "archive_name": "rep_applications.tar.gz",
+  "database_name": "metadata.db",
+  "report_name": "discrepancy_report.md"
+}
