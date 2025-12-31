@@ -1,0 +1,15 @@
+# Configuration for the Repository Application Manager
+
+# Default source directory for packaging
+default_source: "rep_apps"
+
+# Default output archive name
+default_output: "rep_applications.tar.gz"
+
+# Default applications for analysis
+analysis:
+  app1: "rep_apps/app1"
+  app2: "rep_apps/app2"
+
+# Database file
+database_file: "metadata.db"
