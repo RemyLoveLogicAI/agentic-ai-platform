@@ -1,0 +1,28 @@
+{
+    "app1": {
+        "notes": "This is the first application.",
+        "status": "analyzed",
+        "deployment_steps": [
+            "pip install -r requirements.txt",
+            "python app1.py"
+        ],
+        "analysis": {
+            "discrepancies": [],
+            "timestamp": "2025-09-16T07:02:41.465793"
+        }
+    },
+    "app2": {
+        "notes": "This is the second application. It is missing some files.",
+        "status": "analyzed",
+        "deployment_steps": [
+            "python app2.py"
+        ],
+        "analysis": {
+            "discrepancies": [
+                "Missing README.md",
+                "Missing requirements.txt"
+            ],
+            "timestamp": "2025-09-16T07:02:41.466050"
+        }
+    }
+}
