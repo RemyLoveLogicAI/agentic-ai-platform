@@ -1,0 +1,22 @@
+# Configuration for the application packaging and analysis tools
+
+# Directory settings
+paths:
+  # The directory where the 'rep applications' are located.
+  applications: apps
+
+  # The directory where the packaged archives will be saved.
+  distribution: dist
+
+  # The directory where metadata is stored.
+  metadata: metadata
+
+# Database settings
+database:
+  # The name of the SQLite database file.
+  filename: metadata.db
+
+# Packaging settings
+packaging:
+  # The base name for the output archive. A timestamp will be appended.
+  archive_basename: rep_applications
